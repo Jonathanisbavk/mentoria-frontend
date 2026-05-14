@@ -41,6 +41,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
   }
 
+  // Validar que el mentor exista y esté activo
+  const { data: mentorProfile } = await supabase
+    .from('mentor_profiles')
+    .select('id, is_active')
+    .eq('id', mentor_id)
+    .single()
+
+  if (!mentorProfile) {
+    return NextResponse.json({ error: 'Mentor no encontrado' }, { status: 400 })
+  }
+
+  if (!mentorProfile.is_active) {
+    return NextResponse.json({ error: 'Este mentor no está disponible actualmente' }, { status: 400 })
+  }
+
+  // Validar que la fecha sea futura
+  if (new Date(scheduled_at) <= new Date()) {
+    return NextResponse.json({ error: 'La fecha de la sesión debe ser futura' }, { status: 400 })
+  }
+
   const { data, error } = await supabase
     .from('sessions')
     .insert({

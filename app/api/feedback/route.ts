@@ -57,6 +57,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Recalcular avg_rating del mentor (el trigger de BD también lo hace,
+  // pero esto garantiza consistencia si el trigger aún no está aplicado)
+  if (reviewee_id === session.mentor_id) {
+    const { data: allFeedback } = await supabase
+      .from('feedback')
+      .select('rating')
+      .eq('reviewee_id', reviewee_id)
+
+    if (allFeedback && allFeedback.length > 0) {
+      const avg = allFeedback.reduce((sum, f) => sum + f.rating, 0) / allFeedback.length
+      await supabase
+        .from('mentor_profiles')
+        .update({ avg_rating: parseFloat(avg.toFixed(2)) })
+        .eq('id', reviewee_id)
+    }
+  }
+
   return NextResponse.json(data, { status: 201 })
 }
 
