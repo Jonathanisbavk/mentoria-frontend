@@ -145,7 +145,7 @@ export function Sidebar() {
               backgroundColor: 'rgba(255,255,255,0.06)',
             }}
           >
-            <Avatar name={user.avatar} size={34} />
+            <Avatar src={user.avatar} name={user.name} size={34} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
@@ -160,7 +160,7 @@ export function Sidebar() {
                 {user.name.split(' ').slice(0, 2).join(' ')}
               </div>
               <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>
-                {roleLabel}{user.cycle ? ` · ${user.cycle}` : ''}
+                {roleLabel}
               </div>
             </div>
             <button

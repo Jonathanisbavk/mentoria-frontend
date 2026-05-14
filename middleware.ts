@@ -27,18 +27,23 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/callback')
-  const isApiRoute = pathname.startsWith('/api')
+  const isPublic =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/callback') ||
+    pathname.startsWith('/api/')
 
-  if (!user && !isAuthRoute && !isApiRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+  if (isPublic) {
+    if (user && pathname === '/login') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
+    return supabaseResponse
   }
 
-  if (user && pathname === '/login') {
+  if (!user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 

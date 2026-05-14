@@ -6,10 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { useSupabase } from '@/components/providers/supabase-provider'
 
 type AuthUser = {
+  id: string
   name: string
-  avatar: string
+  avatar: string | null
   role: 'admin' | 'mentor' | 'apprentice'
-  cycle?: string
 }
 
 type AuthContextType = {
@@ -23,20 +23,19 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { profile } = useSupabase()
+  const { user: supabaseUser, profile } = useSupabase()
   const router = useRouter()
   const supabase = createClient()
 
   const user = useMemo<AuthUser | null>(() => {
-    if (!profile) return null
-
+    if (!supabaseUser || !profile) return null
     return {
+      id: supabaseUser.id,
       name: profile.full_name,
-      avatar: profile.full_name,
+      avatar: profile.avatar_url,
       role: profile.role,
-      cycle: profile.timezone,
     }
-  }, [profile])
+  }, [supabaseUser, profile])
 
   async function logout() {
     await supabase.auth.signOut()
