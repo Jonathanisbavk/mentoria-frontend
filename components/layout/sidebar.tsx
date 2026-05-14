@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
@@ -31,7 +32,7 @@ export function Sidebar() {
   return (
     <aside className="hidden w-64 shrink-0 border-r border-gray-200 bg-white lg:flex lg:flex-col">
       <div className="flex h-16 items-center px-6 border-b border-gray-200">
-        <span className="text-xl font-bold text-indigo-600">MentorIA</span>
+        <Image src="/certus-logo.png" alt="Certus" width={120} height={36} className="object-contain" />
       </div>
       <nav className="flex-1 overflow-y-auto px-4 py-4">
         <ul className="space-y-1">
@@ -42,7 +43,7 @@ export function Sidebar() {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   pathname === href || pathname.startsWith(href + '/')
-                    ? 'bg-indigo-50 text-indigo-700'
+                    ? 'bg-certus-50 text-certus-700'
                     : 'text-gray-700 hover:bg-gray-100'
                 )}
               >

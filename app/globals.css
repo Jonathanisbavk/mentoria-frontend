@@ -10,6 +10,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-certus-50: #eff5ff;
+  --color-certus-100: #d1e2fc;
+  --color-certus-200: #a3c5f9;
+  --color-certus-600: #003da5;
+  --color-certus-700: #002e80;
+  --color-certus-800: #001f5c;
 }
 
 @media (prefers-color-scheme: dark) {

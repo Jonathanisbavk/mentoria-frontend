@@ -3,6 +3,7 @@
 import { useSupabase } from '@/components/providers/supabase-provider'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
@@ -25,7 +26,9 @@ export function Header() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
-      <div className="lg:hidden text-xl font-bold text-indigo-600">MentorIA</div>
+      <div className="lg:hidden">
+        <Image src="/certus-logo.png" alt="Certus" width={100} height={30} className="object-contain" />
+      </div>
       <div className="ml-auto flex items-center gap-4">
         {profile && (
           <>
