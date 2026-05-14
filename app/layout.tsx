@@ -1,47 +1,21 @@
-import type { Metadata } from 'next';
-import { Sora, DM_Sans } from 'next/font/google';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from '@/context/AuthContext';
-import './globals.css';
+import type { Metadata } from 'next'
+import { Geist } from 'next/font/google'
+import './globals.css'
+import { SupabaseProvider } from '@/components/providers/supabase-provider'
 
-const sora = Sora({
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
-  variable: '--font-sora',
-  display: 'swap',
-});
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-});
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'CertusMenutoría — Plataforma de Mentoría entre Pares',
-  description: 'Conecta con mentores avanzados de Certus Instituto para acelerar tu aprendizaje académico y profesional.',
-};
+  title: 'MentorIA — Mentoría entre Estudiantes',
+  description: 'Conecta con mentores de ciclos avanzados para impulsar tu carrera académica',
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${sora.variable} ${dmSans.variable} h-full`}>
-      <body className="min-h-full antialiased">
-        <AuthProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)',
-                fontSize: '14px',
-                borderRadius: '10px',
-              },
-            }}
-          />
-        </AuthProvider>
+    <html lang="es" className={`${geist.variable} h-full antialiased`}>
+      <body className="h-full bg-gray-50 font-sans">
+        <SupabaseProvider>{children}</SupabaseProvider>
       </body>
     </html>
-  );
+  )
 }

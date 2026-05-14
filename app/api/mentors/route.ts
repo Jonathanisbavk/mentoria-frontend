@@ -1,38 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/mockData';
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const specialty = searchParams.get('specialty');
-  const available = searchParams.get('available');
-  const minRating = searchParams.get('minRating');
-  const recommended = searchParams.get('recommended');
-  const limitParam = searchParams.get('limit');
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const specialty = searchParams.get('specialty')
+  const minRating = searchParams.get('rating')
+  const q = searchParams.get('q')
 
-  let result = db.mentors.map((m) => ({
-    ...m,
-    user: db.users.find((u) => u.id === m.userId),
-  }));
+  const supabase = await createClient()
+
+  let query = supabase
+    .from('mentor_profiles')
+    .select(`
+      *,
+      profiles!inner(id, full_name, avatar_url, bio)
+    `)
+    .eq('is_active', true)
+    .order('avg_rating', { ascending: false })
 
   if (specialty) {
-    result = result.filter((m) => m.specialty === specialty);
-  }
-
-  if (available === 'true') {
-    result = result.filter((m) => m.available);
+    query = query.contains('specialties', [specialty])
   }
 
   if (minRating) {
-    result = result.filter((m) => m.rating >= parseFloat(minRating));
+    query = query.gte('avg_rating', parseFloat(minRating))
   }
 
-  if (recommended === 'true') {
-    result = result.sort((a, b) => b.rating - a.rating);
+  if (q) {
+    query = query.ilike('profiles.full_name', `%${q}%`)
   }
 
-  if (limitParam) {
-    result = result.slice(0, parseInt(limitParam));
+  const { data, error } = await query
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ data: result, status: 'ok' });
+  return NextResponse.json(data)
 }

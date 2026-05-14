@@ -1,64 +1,62 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/mockData';
-import type { Session } from '@/lib/types';
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const userId = searchParams.get('userId');
-  const status = searchParams.get('status');
-  const limitParam = searchParams.get('limit');
-  const mentorId = searchParams.get('mentorId');
+export async function GET() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  let result = db.sessions.map((s) => ({
-    ...s,
-    mentor: db.users.find((u) => u.id === s.mentorId),
-    apprentice: db.users.find((u) => u.id === s.apprenticeId),
-  }));
-
-  if (userId) {
-    result = result.filter((s) => s.mentorId === userId || s.apprenticeId === userId);
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (mentorId) {
-    result = result.filter((s) => s.mentorId === mentorId);
+  const { data, error } = await supabase
+    .from('sessions')
+    .select(`
+      *,
+      mentor:profiles!sessions_mentor_id_fkey(id, full_name, avatar_url),
+      apprentice:profiles!sessions_apprentice_id_fkey(id, full_name, avatar_url)
+    `)
+    .or(`mentor_id.eq.${user.id},apprentice_id.eq.${user.id}`)
+    .order('scheduled_at', { ascending: true })
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  if (status) {
-    result = result.filter((s) => s.status === status);
-  }
-
-  if (limitParam) {
-    result = result.slice(0, parseInt(limitParam));
-  }
-
-  return NextResponse.json({ data: result, status: 'ok' });
+  return NextResponse.json(data)
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const newSession: Session = {
-      id: `s${Date.now()}`,
-      mentorId: body.mentorId,
-      apprenticeId: body.apprenticeId || 'u1',
-      topic: body.topic,
-      date: body.date,
-      time: body.time,
-      duration: body.duration || 60,
-      status: 'pending',
-      type: body.type || 'videocall',
-    };
+export async function POST(request: Request) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-    db.sessions.push(newSession);
-
-    const enriched = {
-      ...newSession,
-      mentor: db.users.find((u) => u.id === newSession.mentorId),
-      apprentice: db.users.find((u) => u.id === newSession.apprenticeId),
-    };
-
-    return NextResponse.json({ data: enriched, status: 'ok' }, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: 'Error al crear sesión', status: 'error' }, { status: 500 });
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const body = await request.json()
+  const { mentor_id, title, description, scheduled_at, duration_minutes } = body
+
+  if (!mentor_id || !title || !scheduled_at) {
+    return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
+  }
+
+  const { data, error } = await supabase
+    .from('sessions')
+    .insert({
+      mentor_id,
+      apprentice_id: user.id,
+      title,
+      description,
+      scheduled_at,
+      duration_minutes: duration_minutes ?? 60,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json(data, { status: 201 })
 }
