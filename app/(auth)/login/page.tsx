@@ -89,9 +89,9 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Plataforma de Mentoría</h1>
+            <h1 className="text-2xl font-bold text-gray-900">MentorIA · Certus</h1>
             <p className="mt-1 text-sm text-gray-500">
-              Inicia sesión para conectarte con tus mentores
+              Mentoría entre estudiantes de Diseño y Desarrollo de Software
             </p>
           </div>
         </div>
@@ -344,7 +344,7 @@ export default function LoginPage() {
         {/* Features */}
         <div className="grid grid-cols-3 gap-3 text-center">
           {[
-            { icon: '🎓', text: 'Aprende de expertos' },
+            { icon: '💻', text: 'Aprende a programar' },
             { icon: '📅', text: 'Agenda sesiones' },
             { icon: '⭐', text: 'Califica mentores' },
           ].map(({ icon, text }) => (

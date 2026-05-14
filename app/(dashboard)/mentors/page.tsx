@@ -11,8 +11,12 @@ import Link from 'next/link'
 import { Search } from 'lucide-react'
 
 const SPECIALTIES = [
-  'Todos', 'Matemáticas', 'Programación', 'Diseño', 'Inglés',
-  'Física', 'Química', 'Estadística', 'Base de Datos',
+  'Todos',
+  'JavaScript', 'TypeScript', 'React / Next.js', 'Vue / Nuxt',
+  'Node.js / Express', 'Python', 'Java / Spring Boot', 'C# / .NET',
+  'SQL / PostgreSQL', 'MongoDB / NoSQL', 'Git / GitHub',
+  'Docker / DevOps', 'APIs REST / GraphQL', 'Figma / UI-UX',
+  'Algoritmos', 'React Native / Flutter',
 ]
 
 type MentorResult = {
@@ -61,7 +65,7 @@ export default function MentorsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Buscar Mentores</h1>
-        <p className="text-gray-500">Encuentra el mentor ideal para tu área de estudio</p>
+        <p className="text-gray-500">Estudiantes avanzados de Desarrollo de Software listos para guiarte</p>
       </div>
 
       <div className="flex gap-3">
@@ -70,7 +74,7 @@ export default function MentorsPage() {
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Buscar por nombre..."
+            placeholder="Buscar por nombre o tecnología..."
             className="h-10 w-full rounded-lg border border-gray-300 pl-10 pr-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           />
         </div>
@@ -111,8 +115,9 @@ export default function MentorsPage() {
           ))}
         </div>
       ) : mentors.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-gray-500">No se encontraron mentores con esos filtros</p>
+        <div className="py-16 text-center space-y-2">
+          <p className="text-gray-700 font-medium">No se encontraron mentores con esos filtros</p>
+          <p className="text-sm text-gray-400">Prueba con otra tecnología o busca por nombre</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

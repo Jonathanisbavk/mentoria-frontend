@@ -73,8 +73,8 @@ export default async function DashboardPage() {
         </h1>
         <p className="text-gray-500">
           {profile?.role === 'mentor'
-            ? 'Gestiona tus mentorías y aprendices'
-            : 'Encuentra mentores y agenda tus sesiones'}
+            ? 'Comparte tu experiencia en desarrollo y ayuda a tus compañeros a crecer'
+            : 'Aprende desarrollo de software con la guía de estudiantes avanzados de Certus'}
         </p>
       </div>
 
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
               <p className="text-gray-500">No tienes sesiones próximas</p>
               {profile?.role === 'apprentice' && (
                 <Link href="/mentors">
-                  <Button className="mt-4" size="sm">Buscar mentores</Button>
+                  <Button className="mt-4" size="sm">Buscar mentor de desarrollo</Button>
                 </Link>
               )}
             </div>
