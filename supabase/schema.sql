@@ -1,17 +1,23 @@
 -- ============================================================
--- MENTORIA APP — Supabase Schema
--- Ejecutar en Supabase SQL Editor (en orden)
+-- MENTORIA APP — Supabase Schema (idempotente — se puede re-ejecutar)
 -- ============================================================
 
 -- 1. Extensiones
 create extension if not exists "uuid-ossp";
 
--- 2. Enums
-create type user_role as enum ('admin', 'mentor', 'apprentice');
-create type session_status as enum ('pending', 'confirmed', 'cancelled', 'completed');
+-- 2. Enums (IF NOT EXISTS via bloque DO)
+do $$ begin
+  create type user_role as enum ('admin', 'mentor', 'apprentice');
+exception when duplicate_object then null;
+end $$;
 
--- 3. Tabla profiles (extiende auth.users)
-create table public.profiles (
+do $$ begin
+  create type session_status as enum ('pending', 'confirmed', 'cancelled', 'completed');
+exception when duplicate_object then null;
+end $$;
+
+-- 3. Tabla profiles
+create table if not exists public.profiles (
   id                    uuid primary key references auth.users(id) on delete cascade,
   role                  user_role not null default 'apprentice',
   full_name             text not null default '',
@@ -24,7 +30,7 @@ create table public.profiles (
 );
 
 -- 4. Tabla mentor_profiles
-create table public.mentor_profiles (
+create table if not exists public.mentor_profiles (
   id               uuid primary key references public.profiles(id) on delete cascade,
   specialties      text[] not null default '{}',
   experience_years int not null default 0,
@@ -37,24 +43,24 @@ create table public.mentor_profiles (
 );
 
 -- 5. Tabla sessions
-create table public.sessions (
-  id               uuid primary key default uuid_generate_v4(),
-  mentor_id        uuid not null references public.profiles(id) on delete cascade,
-  apprentice_id    uuid not null references public.profiles(id) on delete cascade,
-  title            text not null,
-  description      text,
-  scheduled_at     timestamptz not null,
-  duration_minutes int not null default 60,
-  status           session_status not null default 'pending',
-  meet_url         text,
+create table if not exists public.sessions (
+  id                uuid primary key default uuid_generate_v4(),
+  mentor_id         uuid not null references public.profiles(id) on delete cascade,
+  apprentice_id     uuid not null references public.profiles(id) on delete cascade,
+  title             text not null,
+  description       text,
+  scheduled_at      timestamptz not null,
+  duration_minutes  int not null default 60,
+  status            session_status not null default 'pending',
+  meet_url          text,
   calendar_event_id text,
-  notes            text,
-  created_at       timestamptz not null default now(),
-  updated_at       timestamptz not null default now()
+  notes             text,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now()
 );
 
 -- 6. Tabla feedback
-create table public.feedback (
+create table if not exists public.feedback (
   id          uuid primary key default uuid_generate_v4(),
   session_id  uuid not null references public.sessions(id) on delete cascade,
   reviewer_id uuid not null references public.profiles(id) on delete cascade,
@@ -65,12 +71,12 @@ create table public.feedback (
   unique(session_id, reviewer_id)
 );
 
--- 7. Indices
-create index idx_sessions_mentor on public.sessions(mentor_id);
-create index idx_sessions_apprentice on public.sessions(apprentice_id);
-create index idx_sessions_scheduled_at on public.sessions(scheduled_at);
-create index idx_mentor_profiles_specialties on public.mentor_profiles using gin(specialties);
-create index idx_feedback_reviewee on public.feedback(reviewee_id);
+-- 7. Índices
+create index if not exists idx_sessions_mentor         on public.sessions(mentor_id);
+create index if not exists idx_sessions_apprentice     on public.sessions(apprentice_id);
+create index if not exists idx_sessions_scheduled_at   on public.sessions(scheduled_at);
+create index if not exists idx_mentor_profiles_specs   on public.mentor_profiles using gin(specialties);
+create index if not exists idx_feedback_reviewee       on public.feedback(reviewee_id);
 
 -- 8. Función y trigger: updated_at automático
 create or replace function public.set_updated_at()
@@ -81,11 +87,11 @@ begin
 end;
 $$;
 
-create trigger trg_profiles_updated_at
+create or replace trigger trg_profiles_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
 
-create trigger trg_sessions_updated_at
+create or replace trigger trg_sessions_updated_at
   before update on public.sessions
   for each row execute function public.set_updated_at();
 
@@ -98,11 +104,13 @@ begin
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
     new.raw_user_meta_data->>'avatar_url'
-  );
+  )
+  on conflict (id) do nothing;
   return new;
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
@@ -131,15 +139,28 @@ begin
 end;
 $$;
 
-create trigger trg_feedback_update_rating
+create or replace trigger trg_feedback_update_rating
   after insert or update on public.feedback
   for each row execute function public.update_mentor_rating();
 
 -- 11. Row Level Security
-alter table public.profiles enable row level security;
+alter table public.profiles       enable row level security;
 alter table public.mentor_profiles enable row level security;
-alter table public.sessions enable row level security;
-alter table public.feedback enable row level security;
+alter table public.sessions        enable row level security;
+alter table public.feedback        enable row level security;
+
+-- Policies — se eliminan antes de recrear para evitar conflictos
+drop policy if exists "Profiles son visibles por todos"    on public.profiles;
+drop policy if exists "Usuarios editan su propio perfil"   on public.profiles;
+drop policy if exists "Mentor profiles visibles por todos" on public.mentor_profiles;
+drop policy if exists "Mentores crean su perfil"           on public.mentor_profiles;
+drop policy if exists "Mentores editan su perfil"          on public.mentor_profiles;
+drop policy if exists "Participantes ven sus sesiones"     on public.sessions;
+drop policy if exists "Admins ven todas las sesiones"      on public.sessions;
+drop policy if exists "Aprendices crean sesiones"          on public.sessions;
+drop policy if exists "Participantes actualizan sesiones"  on public.sessions;
+drop policy if exists "Feedback visible por todos"         on public.feedback;
+drop policy if exists "Participantes dejan feedback en sesiones completadas" on public.feedback;
 
 -- Profiles
 create policy "Profiles son visibles por todos"
