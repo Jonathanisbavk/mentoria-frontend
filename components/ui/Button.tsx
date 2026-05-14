@@ -17,17 +17,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<Variant, string> = {
-  primary: 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-dark)] active:bg-[var(--brand-primary-dark)] border border-transparent',
-  secondary: 'bg-transparent text-[var(--brand-primary)] border border-[var(--brand-primary)] hover:bg-[var(--brand-primary-bg)] active:bg-[var(--brand-primary-bg)]',
-  ghost: 'bg-transparent text-[var(--brand-slate)] border border-[var(--brand-border)] hover:bg-[var(--brand-surface)] active:bg-[var(--brand-border)]',
-  danger: 'bg-[var(--brand-danger)] text-white border border-transparent hover:opacity-90 active:opacity-80',
-  success: 'bg-[var(--brand-success)] text-white border border-transparent hover:opacity-90 active:opacity-80',
+  primary:   'bg-[#0B2272] text-white hover:bg-[#091A5A] border border-transparent shadow-sm',
+  secondary: 'bg-white text-[#0B2272] border-2 border-[#0B2272] hover:bg-[#EEF1F9]',
+  ghost:     'bg-transparent text-gray-600 border border-gray-200 hover:bg-gray-50',
+  danger:    'bg-red-600 text-white border border-transparent hover:bg-red-700',
+  success:   'bg-green-600 text-white border border-transparent hover:bg-green-700',
 };
 
 const sizeStyles: Record<Size, string> = {
-  sm: 'h-8 px-3 text-xs gap-1.5',
-  md: 'h-10 px-4 text-sm gap-2',
-  lg: 'h-12 px-6 text-sm gap-2',
+  sm: 'h-8 px-3 text-xs gap-1.5 rounded-lg',
+  md: 'h-10 px-4 text-sm gap-2 rounded-xl',
+  lg: 'h-12 px-6 text-sm gap-2 rounded-xl',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -39,7 +39,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={isDisabled}
         className={cn(
-          'inline-flex items-center justify-center font-medium rounded-[10px] transition-all duration-150 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[var(--brand-primary)] focus-visible:outline-offset-2',
+          'inline-flex items-center justify-center font-semibold transition-all duration-150 cursor-pointer select-none',
+          'focus-visible:outline-2 focus-visible:outline-[#0B2272] focus-visible:outline-offset-2',
           variantStyles[variant],
           sizeStyles[size],
           isDisabled && 'opacity-50 cursor-not-allowed pointer-events-none',

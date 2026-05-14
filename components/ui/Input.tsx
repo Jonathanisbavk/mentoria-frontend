@@ -19,18 +19,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium"
-            style={{ color: 'var(--brand-dark)' }}
+            className="text-sm font-semibold text-gray-800"
           >
             {label}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <span
-              className="absolute left-3 top-1/2 -translate-y-1/2"
-              style={{ color: 'var(--brand-slate-light)' }}
-            >
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
               {icon}
             </span>
           )}
@@ -38,28 +34,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              'w-full h-10 rounded-[10px] border text-sm transition-colors',
-              'placeholder:text-[var(--brand-slate-light)]',
-              icon ? 'pl-9 pr-4' : 'px-4',
+              'w-full h-11 rounded-xl border text-sm transition-all duration-150 outline-none',
+              'text-gray-900 bg-white placeholder:text-gray-400',
+              icon ? 'pl-10 pr-4' : 'px-4',
               error
-                ? 'border-[var(--brand-danger)] focus:border-[var(--brand-danger)] focus:ring-2 focus:ring-[var(--brand-danger)]/20'
-                : 'border-[var(--brand-border)] focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20',
-              'outline-none',
+                ? 'border-red-400 ring-1 ring-red-300 focus:border-red-500 focus:ring-red-300'
+                : 'border-gray-300 focus:border-[#0B2272] focus:ring-2 focus:ring-[#0B2272]/20',
               className
             )}
-            style={{ color: 'var(--brand-dark)', backgroundColor: 'white' }}
             {...props}
           />
         </div>
         {error && (
-          <p className="text-xs" style={{ color: 'var(--brand-danger)' }}>
-            {error}
-          </p>
+          <p className="text-xs text-red-600 font-medium">{error}</p>
         )}
         {helper && !error && (
-          <p className="text-xs" style={{ color: 'var(--brand-slate-light)' }}>
-            {helper}
-          </p>
+          <p className="text-xs text-gray-500">{helper}</p>
         )}
       </div>
     );

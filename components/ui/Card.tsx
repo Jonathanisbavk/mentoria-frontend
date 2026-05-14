@@ -12,7 +12,7 @@ export function Card({ padding = 24, children, className, clickable, onClick, ..
     <div
       onClick={onClick}
       className={cn(
-        'bg-white border border-[var(--brand-border)] rounded-2xl',
+        'bg-white border border-gray-200 rounded-2xl shadow-sm',
         clickable || onClick ? 'cursor-pointer hover:shadow-md transition-shadow duration-200' : '',
         className
       )}
@@ -22,4 +22,16 @@ export function Card({ padding = 24, children, className, clickable, onClick, ..
       {children}
     </div>
   );
+}
+
+export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('flex flex-col gap-1', className)} {...props} />
+}
+
+export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+  return <h3 className={cn('text-base font-semibold tracking-tight text-gray-900', className)} {...props} />
+}
+
+export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('pt-4', className)} {...props} />
 }

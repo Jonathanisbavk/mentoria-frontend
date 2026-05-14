@@ -1,31 +1,35 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { GraduationCap, Home, Search, Calendar, Star, Shield, LogOut, ChevronRight } from 'lucide-react';
+import { Home, Search, Calendar, User, Shield, LogOut, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { Avatar } from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui/avatar';
 
 const navItems = [
-  { href: '/dashboard', label: 'Inicio', icon: Home },
-  { href: '/mentores', label: 'Buscar Mentores', icon: Search },
-  { href: '/agenda', label: 'Mi Agenda', icon: Calendar },
-  { href: '/valoraciones', label: 'Valoraciones', icon: Star },
-  { href: '/admin', label: 'Administración', icon: Shield, adminOnly: true },
+  { href: '/dashboard', label: 'Inicio',          icon: Home     },
+  { href: '/mentors',   label: 'Buscar Mentores', icon: Search   },
+  { href: '/sessions',  label: 'Mis Sesiones',    icon: Calendar },
+  { href: '/profile',   label: 'Mi Perfil',       icon: User     },
+  { href: '/admin',     label: 'Administración',  icon: Shield, adminOnly: true },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const roleLabel = user?.role === 'aprendiz' ? 'Aprendiz' : user?.role === 'mentor' ? 'Mentor' : 'Administrador';
+  const roleLabel =
+    user?.role === 'apprentice' ? 'Aprendiz'
+    : user?.role === 'mentor' ? 'Mentor'
+    : 'Administrador';
 
   return (
     <aside
       style={{
         width: 240,
         minHeight: '100vh',
-        backgroundColor: 'var(--brand-dark)',
+        backgroundColor: '#091A5A',
         display: 'flex',
         flexDirection: 'column',
         position: 'fixed',
@@ -34,39 +38,66 @@ export function Sidebar() {
         zIndex: 40,
       }}
     >
-      {/* Logo */}
-      <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+      {/* ── Logo ── */}
+      <div
+        style={{
+          padding: '20px 16px 16px',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        <Link
+          href="/dashboard"
+          style={{ display: 'block', textDecoration: 'none' }}
+        >
           <div
             style={{
-              width: 38,
-              height: 38,
+              background: 'white',
               borderRadius: 10,
-              backgroundColor: 'var(--brand-primary)',
+              padding: '8px 12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0,
             }}
           >
-            <GraduationCap size={20} color="white" />
+            <Image
+              src="/certus-logo.svg"
+              alt="Certus"
+              width={116}
+              height={36}
+              priority
+            />
           </div>
-          <div>
-            <div style={{ fontFamily: 'var(--font-sora, Sora, sans-serif)', fontWeight: 700, fontSize: 15, color: 'white', lineHeight: 1.2 }}>
-              Certus
-            </div>
-            <div style={{ fontFamily: 'var(--font-sora, Sora, sans-serif)', fontWeight: 600, fontSize: 13, color: 'var(--brand-primary-light)', lineHeight: 1.2 }}>
-              Mentoría
-            </div>
-          </div>
+          <p
+            style={{
+              marginTop: 8,
+              textAlign: 'center',
+              fontSize: 11,
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.45)',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Plataforma de Mentoría
+          </p>
         </Link>
       </div>
 
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {/* ── Nav ── */}
+      <nav
+        style={{
+          flex: 1,
+          padding: '16px 10px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         {navItems.map(({ href, label, icon: Icon, adminOnly }) => {
           if (adminOnly && user?.role !== 'admin') return null;
-          const isActive = pathname === href || pathname.startsWith(href + '/');
+          const isActive =
+            pathname === href ||
+            (href !== '/dashboard' && pathname.startsWith(href + '/'));
 
           return (
             <Link
@@ -76,34 +107,34 @@ export function Sidebar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '10px 12px',
+                padding: '9px 12px',
                 borderRadius: 10,
                 textDecoration: 'none',
                 transition: 'background 0.15s',
-                backgroundColor: isActive ? 'var(--brand-primary)' : 'transparent',
+                backgroundColor: isActive ? '#0B2272' : 'transparent',
                 color: isActive ? 'white' : 'rgba(255,255,255,0.6)',
-                fontSize: 14,
+                fontSize: 13.5,
                 fontWeight: isActive ? 600 : 400,
               }}
-              onMouseEnter={(e) => {
-                if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.05)';
+              onMouseEnter={e => {
+                if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.07)';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
               }}
               aria-current={isActive ? 'page' : undefined}
             >
-              <Icon size={18} style={{ flexShrink: 0 }} />
+              <Icon size={16} style={{ flexShrink: 0 }} />
               <span style={{ flex: 1 }}>{label}</span>
-              {isActive && <ChevronRight size={14} />}
+              {isActive && <ChevronRight size={12} style={{ opacity: 0.6 }} />}
             </Link>
           );
         })}
       </nav>
 
-      {/* User card */}
+      {/* ── User ── */}
       {user && (
-        <div style={{ padding: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ padding: '12px 10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <div
             style={{
               display: 'flex',
@@ -111,16 +142,25 @@ export function Sidebar() {
               gap: 10,
               padding: '10px 12px',
               borderRadius: 10,
-              backgroundColor: 'rgba(255,255,255,0.05)',
+              backgroundColor: 'rgba(255,255,255,0.06)',
             }}
           >
-            <Avatar initials={user.avatar} size={36} />
+            <Avatar name={user.avatar} size={34} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: 'white', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {user.name.split(' ')[0]} {user.name.split(' ')[1]}
+              <div
+                style={{
+                  color: 'white',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {user.name.split(' ').slice(0, 2).join(' ')}
               </div>
               <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>
-                {roleLabel} · {user.cycle}
+                {roleLabel}{user.cycle ? ` · ${user.cycle}` : ''}
               </div>
             </div>
             <button
@@ -137,11 +177,11 @@ export function Sidebar() {
                 alignItems: 'center',
                 transition: 'color 0.15s',
               }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = 'white')}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)')}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'white')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)')}
               aria-label="Cerrar sesión"
             >
-              <LogOut size={16} />
+              <LogOut size={15} />
             </button>
           </div>
         </div>
