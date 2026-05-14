@@ -1,34 +1,59 @@
-import { cn } from '@/lib/utils/cn'
-import { forwardRef, type InputHTMLAttributes } from 'react'
+'use client';
+
+import { forwardRef, InputHTMLAttributes, ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
+  label?: string;
+  error?: string;
+  helper?: string;
+  icon?: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, id, ...props }, ref) => (
-    <div className="flex flex-col gap-1.5">
-      {label && (
-        <label htmlFor={id} className="text-sm font-medium text-gray-700">
-          {label}
-        </label>
-      )}
-      <input
-        ref={ref}
-        id={id}
-        className={cn(
-          'h-10 w-full rounded-lg border border-gray-300 px-3 text-sm',
-          'placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
-          'disabled:cursor-not-allowed disabled:bg-gray-50',
-          error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
-          className
-        )}
-        {...props}
-      />
-      {error && <p className="text-xs text-red-600">{error}</p>}
-    </div>
-  )
-)
+  ({ label, error, helper, icon, className, id, ...props }, ref) => {
+    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
-Input.displayName = 'Input'
+    return (
+      <div className="flex flex-col gap-1.5">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="text-sm font-semibold text-gray-800"
+          >
+            {label}
+          </label>
+        )}
+        <div className="relative">
+          {icon && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              {icon}
+            </span>
+          )}
+          <input
+            ref={ref}
+            id={inputId}
+            className={cn(
+              'w-full h-11 rounded-xl border text-sm transition-all duration-150 outline-none',
+              'text-gray-900 bg-white placeholder:text-gray-400',
+              icon ? 'pl-10 pr-4' : 'px-4',
+              error
+                ? 'border-red-400 ring-1 ring-red-300 focus:border-red-500 focus:ring-red-300'
+                : 'border-gray-300 focus:border-[#0B2272] focus:ring-2 focus:ring-[#0B2272]/20',
+              className
+            )}
+            {...props}
+          />
+        </div>
+        {error && (
+          <p className="text-xs text-red-600 font-medium">{error}</p>
+        )}
+        {helper && !error && (
+          <p className="text-xs text-gray-500">{helper}</p>
+        )}
+      </div>
+    );
+  }
+);
+
+Input.displayName = 'Input';

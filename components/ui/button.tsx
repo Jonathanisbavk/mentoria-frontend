@@ -1,52 +1,63 @@
-import { cn } from '@/lib/utils/cn'
-import { type ButtonHTMLAttributes, forwardRef } from 'react'
+'use client';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
-type Size = 'sm' | 'md' | 'lg'
+import { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+type Size = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant
-  size?: Size
-  loading?: boolean
+  variant?: Variant;
+  size?: Size;
+  icon?: ReactNode;
+  iconPosition?: 'left' | 'right';
+  loading?: boolean;
+  children?: ReactNode;
 }
 
-const variants: Record<Variant, string> = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500',
-  secondary: 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50 focus-visible:ring-gray-400',
-  ghost: 'text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-400',
-  danger: 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500',
-}
+const variantStyles: Record<Variant, string> = {
+  primary:   'bg-[#0B2272] text-white hover:bg-[#091A5A] border border-transparent shadow-sm',
+  secondary: 'bg-white text-[#0B2272] border-2 border-[#0B2272] hover:bg-[#EEF1F9]',
+  ghost:     'bg-transparent text-gray-600 border border-gray-200 hover:bg-gray-50',
+  danger:    'bg-red-600 text-white border border-transparent hover:bg-red-700',
+  success:   'bg-green-600 text-white border border-transparent hover:bg-green-700',
+};
 
-const sizes: Record<Size, string> = {
-  sm: 'h-8 px-3 text-sm',
-  md: 'h-10 px-4 text-sm',
-  lg: 'h-11 px-6 text-base',
-}
+const sizeStyles: Record<Size, string> = {
+  sm: 'h-8 px-3 text-xs gap-1.5 rounded-lg',
+  md: 'h-10 px-4 text-sm gap-2 rounded-xl',
+  lg: 'h-12 px-6 text-sm gap-2 rounded-xl',
+};
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', loading, disabled, children, ...props }, ref) => (
-    <button
-      ref={ref}
-      disabled={disabled || loading}
-      className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-lg font-medium',
-        'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        variants[variant],
-        sizes[size],
-        className
-      )}
-      {...props}
-    >
-      {loading && (
-        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
-      )}
-      {children}
-    </button>
-  )
-)
+  ({ variant = 'primary', size = 'md', icon, iconPosition = 'left', loading, children, className, disabled, ...props }, ref) => {
+    const isDisabled = disabled || loading;
 
-Button.displayName = 'Button'
+    return (
+      <button
+        ref={ref}
+        disabled={isDisabled}
+        className={cn(
+          'inline-flex items-center justify-center font-semibold transition-all duration-150 cursor-pointer select-none',
+          'focus-visible:outline-2 focus-visible:outline-[#0B2272] focus-visible:outline-offset-2',
+          variantStyles[variant],
+          sizeStyles[size],
+          isDisabled && 'opacity-50 cursor-not-allowed pointer-events-none',
+          className
+        )}
+        {...props}
+      >
+        {loading ? (
+          <Loader2 size={14} className="animate-spin shrink-0" />
+        ) : (
+          icon && iconPosition === 'left' && <span className="shrink-0">{icon}</span>
+        )}
+        {children && <span>{children}</span>}
+        {!loading && icon && iconPosition === 'right' && <span className="shrink-0">{icon}</span>}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';

@@ -2,19 +2,22 @@ import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
 import { SupabaseProvider } from '@/components/providers/supabase-provider'
+import { AuthProvider } from '@/context/AuthContext'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'MentorIA — Mentoría entre Estudiantes',
-  description: 'Conecta con mentores de ciclos avanzados para impulsar tu carrera académica',
+  title: 'Mentoría Certus — Aprende de quienes ya recorrieron tu camino',
+  description: 'Conecta con estudiantes de ciclos avanzados en Certus. Agenda sesiones, recibe guía personalizada y avanza más rápido.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${geist.variable} h-full antialiased`}>
       <body className="h-full bg-gray-50 font-sans">
-        <SupabaseProvider>{children}</SupabaseProvider>
+        <SupabaseProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </SupabaseProvider>
       </body>
     </html>
   )

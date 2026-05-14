@@ -5,9 +5,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-full">
       <Sidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      {/* ml-[240px] matches the fixed sidebar width */}
+      <div className="ml-[240px] flex flex-1 flex-col overflow-hidden min-h-screen">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">{children}</main>
       </div>
     </div>
   )

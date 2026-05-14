@@ -4,8 +4,8 @@ import { useSupabase } from '@/components/providers/supabase-provider'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Avatar } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
+import Image from 'next/image'
 
 export function Header() {
   const { profile } = useSupabase()
@@ -17,34 +17,38 @@ export function Header() {
     router.push('/login')
   }
 
-  const roleLabel = {
+  const roleLabel: Record<string, string> = {
     admin: 'Administrador',
     mentor: 'Mentor',
     apprentice: 'Aprendiz',
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
-      <div className="lg:hidden text-xl font-bold text-indigo-600">MentorIA</div>
-      <div className="ml-auto flex items-center gap-4">
+    <header className="flex h-14 items-center justify-between border-b border-gray-100 bg-white px-6 shadow-sm">
+      {/* Logo visible en móvil cuando el sidebar no está */}
+      <div className="lg:hidden">
+        <Image src="/certus-logo.svg" alt="Certus" width={100} height={32} />
+      </div>
+      <div className="hidden lg:block" />
+
+      <div className="ml-auto flex items-center gap-3">
         {profile && (
           <>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <Avatar src={profile.avatar_url} name={profile.full_name || 'U'} size="sm" />
               <div className="hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">{profile.full_name}</p>
-                <p className="text-xs text-gray-500">{roleLabel[profile.role]}</p>
+                <p className="text-sm font-semibold text-gray-900 leading-tight">{profile.full_name}</p>
+                <p className="text-xs text-gray-500 leading-tight">{roleLabel[profile.role]}</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
+            <div className="h-6 w-px bg-gray-200" />
+            <button
               onClick={handleSignOut}
-              className="gap-2 text-gray-500"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
               <span className="hidden sm:inline">Salir</span>
-            </Button>
+            </button>
           </>
         )}
       </div>
