@@ -78,7 +78,7 @@ export function Sidebar() {
               textTransform: 'uppercase',
             }}
           >
-            Plataforma de Mentoría
+            Desarrollo de Software
           </p>
         </Link>
       </div>

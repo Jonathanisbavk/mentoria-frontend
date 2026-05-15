@@ -18,7 +18,11 @@
       "Bash(python -c \"import sys, json; d = json.load\\(sys.stdin\\); print\\(f'mentor ok: {d[\\\\\"status\\\\\"]}, reviews: {len\\(d[\\\\\"data\\\\\"][\\\\\"reviews\\\\\"]\\)}'\\)\")",
       "mcp__Claude_Preview__preview_start",
       "Bash(taskkill /F /IM node.exe)",
-      "PowerShell(Stop-Process -Name node -Force -ErrorAction SilentlyContinue)"
+      "PowerShell(Stop-Process -Name node -Force -ErrorAction SilentlyContinue)",
+      "mcp__supabase__get_publishable_keys"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }
