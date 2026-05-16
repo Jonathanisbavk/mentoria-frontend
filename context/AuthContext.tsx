@@ -3,7 +3,8 @@
 import { createContext, useContext, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useSupabase } from '@/components/providers/supabase-provider'
+import { useAuthStore } from '@/store/auth'
+import { toast } from 'sonner'
 
 type AuthUser = {
   id: string
@@ -23,7 +24,7 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { user: supabaseUser, profile } = useSupabase()
+  const { user: supabaseUser, profile, reset } = useAuthStore()
   const router = useRouter()
   const supabase = createClient()
 
@@ -39,6 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function logout() {
     await supabase.auth.signOut()
+    reset()
+    toast.success('Sesión cerrada correctamente')
     router.push('/login')
   }
 

@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google'
 import './globals.css'
 import { SupabaseProvider } from '@/components/providers/supabase-provider'
 import { AuthProvider } from '@/context/AuthContext'
+import { Toaster } from 'sonner'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SupabaseProvider>
           <AuthProvider>{children}</AuthProvider>
         </SupabaseProvider>
+        <Toaster position="bottom-right" richColors closeButton />
       </body>
     </html>
   )

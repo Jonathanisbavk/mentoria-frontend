@@ -13,7 +13,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
-  const [intendedRole, setIntendedRole] = useState<'apprentice' | 'mentor'>('apprentice')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -57,7 +56,7 @@ export default function LoginPage() {
       email,
       password,
       options: {
-        data: { full_name: name, intended_role: intendedRole },
+        data: { full_name: name },
         emailRedirectTo: `${window.location.origin}/callback`,
       },
     })
@@ -281,33 +280,6 @@ export default function LoginPage() {
                       minLength={6}
                       autoComplete="new-password"
                     />
-
-                    {/* Selector de rol */}
-                    <div>
-                      <p className="mb-2 text-sm font-medium text-gray-700">¿Cuál es tu rol?</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {([
-                          { value: 'apprentice', icon: '🎓', label: 'Aprendiz', desc: 'Busco un mentor' },
-                          { value: 'mentor', icon: '👨‍💻', label: 'Mentor', desc: 'Quiero enseñar' },
-                        ] as const).map(({ value, icon, label, desc }) => (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => setIntendedRole(value)}
-                            className="flex flex-col items-center gap-1 rounded-xl border-2 p-3 text-sm transition-all"
-                            style={{
-                              borderColor: intendedRole === value ? '#0B2272' : '#E5E7EB',
-                              background: intendedRole === value ? '#EEF1F9' : 'white',
-                              color: intendedRole === value ? '#0B2272' : '#374151',
-                            }}
-                          >
-                            <span className="text-xl">{icon}</span>
-                            <span className="font-semibold">{label}</span>
-                            <span className="text-xs text-gray-500">{desc}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
 
                     {error && (
                       <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">

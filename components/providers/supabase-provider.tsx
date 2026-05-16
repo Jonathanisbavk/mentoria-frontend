@@ -1,26 +1,11 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
-import type { Profile } from '@/lib/types/app'
-
-type SupabaseContextType = {
-  user: User | null
-  profile: Profile | null
-  loading: boolean
-}
-
-const SupabaseContext = createContext<SupabaseContextType>({
-  user: null,
-  profile: null,
-  loading: true,
-})
+import { useAuthStore } from '@/store/auth'
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { setUser, setProfile, setLoading, reset } = useAuthStore()
   const supabase = createClient()
 
   async function fetchProfile(userId: string) {
@@ -35,20 +20,15 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         fetchProfile(session.user.id)
       } else {
-        setProfile(null)
-        setLoading(false)
+        reset()
       }
     })
-
     return () => subscription.unsubscribe()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return (
-    <SupabaseContext.Provider value={{ user, profile, loading }}>
-      {children}
-    </SupabaseContext.Provider>
-  )
+  return <>{children}</>
 }
 
-export const useSupabase = () => useContext(SupabaseContext)
+// Compatibility alias — components that called useSupabase() still work
+export const useSupabase = useAuthStore
