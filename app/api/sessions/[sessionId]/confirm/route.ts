@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createCalendarEvent } from '@/lib/google-calendar/calendar'
+import { getUserEmail, sendSessionConfirmed } from '@/lib/email'
 import type { GoogleCalendarTokens, Profile, Session } from '@/lib/types/app'
 
 type Params = { params: Promise<{ sessionId: string }> }
@@ -67,7 +68,7 @@ export async function POST(_request: Request, { params }: Params) {
     meetUrl = result.meetUrl
   }
 
-  // Si ambos tienen tokens, crear también para el aprendiz (si el mentor ya lo creó)
+  // Si ambos tienen tokens, crear también en el calendario del aprendiz
   if (
     calendarEventId &&
     mentorProfile?.google_calendar_token &&
@@ -96,6 +97,24 @@ export async function POST(_request: Request, { params }: Params) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  // Notificar al aprendiz por correo (no bloqueante)
+  if (apprenticeProfile && mentorProfile) {
+    getUserEmail(session.apprentice_id).then(apprenticeEmail => {
+      if (apprenticeEmail) {
+        sendSessionConfirmed({
+          apprenticeEmail,
+          apprenticeName: apprenticeProfile.full_name,
+          mentorName: mentorProfile.full_name,
+          sessionTitle: session.title,
+          scheduledAt: session.scheduled_at,
+          durationMinutes: session.duration_minutes,
+          meetUrl,
+          sessionId,
+        }).catch(console.error)
+      }
+    }).catch(console.error)
   }
 
   return NextResponse.json({

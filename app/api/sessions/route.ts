@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getUserEmail, sendSessionRequest } from '@/lib/email'
 
 export async function GET() {
   const supabase = await createClient()
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'La fecha de la sesión debe ser futura' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
+  const { data: session, error } = await supabase
     .from('sessions')
     .insert({
       mentor_id,
@@ -78,5 +79,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(data, { status: 201 })
+  // Notificar al mentor por correo (no bloqueante)
+  Promise.all([
+    getUserEmail(mentor_id),
+    supabase.from('profiles').select('full_name').eq('id', mentor_id).single(),
+    supabase.from('profiles').select('full_name').eq('id', user.id).single(),
+  ]).then(([mentorEmail, mentorRow, apprenticeRow]) => {
+    if (mentorEmail && mentorRow.data && apprenticeRow.data) {
+      sendSessionRequest({
+        mentorEmail,
+        mentorName: mentorRow.data.full_name,
+        apprenticeName: apprenticeRow.data.full_name,
+        sessionTitle: title,
+        scheduledAt: scheduled_at,
+        durationMinutes: duration_minutes ?? 60,
+        sessionId: session.id,
+      }).catch(console.error)
+    }
+  }).catch(console.error)
+
+  return NextResponse.json(session, { status: 201 })
 }

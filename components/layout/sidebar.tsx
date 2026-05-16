@@ -45,10 +45,7 @@ export function Sidebar() {
           borderBottom: '1px solid rgba(255,255,255,0.08)',
         }}
       >
-        <Link
-          href="/dashboard"
-          style={{ display: 'block', textDecoration: 'none' }}
-        >
+        <Link href="/dashboard" style={{ display: 'block', textDecoration: 'none' }}>
           <div
             style={{
               background: 'white',
@@ -59,13 +56,7 @@ export function Sidebar() {
               justifyContent: 'center',
             }}
           >
-            <Image
-              src="/certus-logo.svg"
-              alt="Certus"
-              width={116}
-              height={36}
-              priority
-            />
+            <Image src="/certus-logo.svg" alt="Certus" width={116} height={36} priority />
           </div>
           <p
             style={{
@@ -132,7 +123,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* ── User ── */}
+      {/* ── Usuario ── */}
       {user && (
         <div style={{ padding: '12px 10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <div
