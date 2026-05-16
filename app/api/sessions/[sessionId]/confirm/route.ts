@@ -6,6 +6,14 @@ import type { GoogleCalendarTokens, Profile, Session } from '@/lib/types/app'
 
 type Params = { params: Promise<{ sessionId: string }> }
 
+// Fallback cuando el mentor no ha conectado Google Calendar:
+// genera una sala Jitsi (funciona sin OAuth, gratis, no requiere cuenta).
+// El nombre de la sala es determinístico => mentor y aprendiz entran al mismo room.
+function generateFallbackMeetUrl(sessionId: string): string {
+  const room = `CertusMentoria-${sessionId.replace(/-/g, '').slice(0, 12)}`
+  return `https://meet.jit.si/${room}`
+}
+
 export async function POST(_request: Request, { params }: Params) {
   const { sessionId } = await params
   const supabase = await createClient()
@@ -84,12 +92,17 @@ export async function POST(_request: Request, { params }: Params) {
     )
   }
 
+  // Fallback: si nadie tiene Google Calendar, generar sala de Jitsi
+  if (!meetUrl) {
+    meetUrl = generateFallbackMeetUrl(sessionId)
+  }
+
   const { data, error } = await supabase
     .from('sessions')
     .update({
       status: 'confirmed',
       ...(calendarEventId ? { calendar_event_id: calendarEventId } : {}),
-      ...(meetUrl ? { meet_url: meetUrl } : {}),
+      meet_url: meetUrl,
     })
     .eq('id', sessionId)
     .select()

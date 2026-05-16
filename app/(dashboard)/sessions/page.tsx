@@ -103,7 +103,7 @@ export default function SessionsPage() {
       return ['pending', 'confirmed'].includes(s.status) && s.scheduled_at >= now
     }
     if (tab === 'completed') return s.status === 'completed'
-    if (tab === 'cancelled') return s.status === 'cancelled' || (s.scheduled_at < now && s.status !== 'completed')
+    if (tab === 'cancelled') return s.status === 'cancelled'
     return false
   })
 

@@ -114,16 +114,21 @@ export default async function SessionDetailPage({ params }: Params) {
             </p>
           )}
           {session.meet_url && (
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-gray-100 space-y-2">
               <a
                 href={session.meet_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full rounded-lg bg-[#1a73e8] hover:bg-[#1558b0] text-white font-medium py-2.5 px-4 transition-colors"
+                className="flex items-center justify-center gap-2 w-full rounded-lg bg-[#0B2272] hover:opacity-90 text-white font-medium py-2.5 px-4 transition-opacity"
               >
                 <Video size={18} />
-                Unirse a Google Meet
+                {session.meet_url.includes('meet.google.com')
+                  ? 'Unirse a Google Meet'
+                  : 'Unirse a la videollamada'}
               </a>
+              <p className="text-xs text-gray-400 text-center break-all">
+                {session.meet_url}
+              </p>
             </div>
           )}
         </CardContent>
