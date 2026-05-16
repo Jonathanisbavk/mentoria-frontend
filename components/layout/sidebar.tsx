@@ -7,12 +7,19 @@ import { Home, Search, Calendar, User, Shield, LogOut, ChevronRight } from 'luci
 import { useAuth } from '@/context/AuthContext';
 import { Avatar } from '@/components/ui/avatar';
 
-const navItems = [
+type NavRole = 'admin' | 'mentor' | 'apprentice'
+
+const navItems: Array<{
+  href: string
+  label: string
+  icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>
+  onlyRoles?: NavRole[]
+}> = [
   { href: '/dashboard', label: 'Inicio',          icon: Home     },
-  { href: '/mentors',   label: 'Buscar Mentores', icon: Search   },
+  { href: '/mentors',   label: 'Buscar Mentores', icon: Search,   onlyRoles: ['apprentice'] },
   { href: '/sessions',  label: 'Mis Sesiones',    icon: Calendar },
   { href: '/profile',   label: 'Mi Perfil',       icon: User     },
-  { href: '/admin',     label: 'Administración',  icon: Shield, adminOnly: true },
+  { href: '/admin',     label: 'Administración',  icon: Shield,   onlyRoles: ['admin'] },
 ];
 
 export function Sidebar() {
@@ -84,8 +91,8 @@ export function Sidebar() {
           gap: 2,
         }}
       >
-        {navItems.map(({ href, label, icon: Icon, adminOnly }) => {
-          if (adminOnly && user?.role !== 'admin') return null;
+        {navItems.map(({ href, label, icon: Icon, onlyRoles }) => {
+          if (onlyRoles && user?.role && !onlyRoles.includes(user.role as NavRole)) return null;
           const isActive =
             pathname === href ||
             (href !== '/dashboard' && pathname.startsWith(href + '/'));
