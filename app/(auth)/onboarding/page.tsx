@@ -55,6 +55,19 @@ const TIME_BLOCKS = [
 
 const TOTAL_STEPS = 4
 
+const STEP_TITLES: Record<number, string> = {
+  0: 'Elige tu rol',
+  1: 'Información personal',
+  2: 'Tus detalles',
+  3: 'Disponibilidad',
+}
+
+function getStepTitle(step: number, role: Role | null): string {
+  if (step === 1) return role === 'mentor' ? 'Perfil profesional' : 'Cuéntanos de ti'
+  if (step === 2) return role === 'mentor' ? 'Tus especialidades' : 'Nivel y objetivos'
+  return STEP_TITLES[step] ?? `Paso ${step + 1}`
+}
+
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
 type Role = 'apprentice' | 'mentor'
@@ -95,12 +108,19 @@ export default function OnboardingPage() {
   const [data, setData] = useState<WizardData>(INITIAL)
   const [submitting, setSubmitting] = useState(false)
 
-  // Pre-llenar nombre desde auth
+  // Pre-llenar nombre y rol desde auth metadata
   useEffect(() => {
     createClient().auth.getUser().then(({ data: { user } }) => {
       if (user) {
         const name = user.user_metadata?.full_name ?? user.user_metadata?.name ?? ''
-        if (name) setData(d => ({ ...d, full_name: name }))
+        const raw = user.user_metadata?.intended_role
+        const intendedRole: Role | null =
+          raw === 'apprentice' || raw === 'mentor' ? raw : null
+        setData(d => ({
+          ...d,
+          ...(name && { full_name: name }),
+          ...(intendedRole && { role: intendedRole }),
+        }))
       }
     })
   }, [])
@@ -192,9 +212,22 @@ export default function OnboardingPage() {
         {/* Barra de progreso */}
         {step < TOTAL_STEPS && (
           <div className="mb-5 space-y-2">
-            <div className="flex justify-between text-xs text-gray-400">
-              <span className="font-medium text-gray-600">Paso {step + 1} de {TOTAL_STEPS}</span>
-              <span>{progress}% completado</span>
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold text-gray-700">
+                  {getStepTitle(step, data.role)}
+                </span>
+                {step > 0 && data.role && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold"
+                    style={{ background: '#EEF1F9', color: '#0B2272' }}
+                  >
+                    <span>{data.role === 'mentor' ? '👨‍💻' : '🎓'}</span>
+                    {data.role === 'mentor' ? 'Mentor' : 'Aprendiz'}
+                  </span>
+                )}
+              </div>
+              <span className="text-gray-400 shrink-0">{progress}%</span>
             </div>
             <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
               <div
@@ -295,11 +328,17 @@ function StepRole({ data, update }: StepProps) {
     },
   ]
 
+  const preselected = !!data.role
+
   return (
     <div className="space-y-5">
       <div className="text-center space-y-1.5">
         <h1 className="text-xl font-bold text-gray-900">¡Bienvenido a MentorIA!</h1>
-        <p className="text-sm text-gray-500">¿Cómo participarás en la plataforma?</p>
+        <p className="text-sm text-gray-500">
+          {preselected
+            ? 'Confirma tu rol o cámbialo si lo necesitas.'
+            : '¿Cómo participarás en la plataforma?'}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -319,19 +358,23 @@ function StepRole({ data, update }: StepProps) {
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl">{icon}</span>
+                  <span className="text-3xl" role="img" aria-hidden>{icon}</span>
                   <div>
                     <p className="font-bold text-gray-900 text-sm">{title}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
                   </div>
                 </div>
-                {active && (
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ background: '#0B2272' }}>
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
+                <div
+                  className={cn(
+                    'w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all',
+                    active ? 'opacity-100' : 'opacity-0'
+                  )}
+                  style={{ background: '#0B2272' }}
+                >
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
               </div>
 
               <ul className="space-y-1.5">
@@ -353,6 +396,12 @@ function StepRole({ data, update }: StepProps) {
           )
         })}
       </div>
+
+      {preselected && (
+        <p className="text-center text-xs text-gray-400">
+          Puedes cambiar tu rol en cualquier momento desde esta pantalla.
+        </p>
+      )}
     </div>
   )
 }

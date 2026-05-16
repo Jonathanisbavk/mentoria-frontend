@@ -79,6 +79,46 @@ INSERT INTO auth.users (
   );
 
 -- ============================================================
+-- 1b. IDENTIDADES DE AUTENTICACIÓN (requeridas por GoTrue)
+-- Sin estos registros el login falla con "Database error querying schema"
+-- ============================================================
+INSERT INTO auth.identities (
+  provider_id, user_id, identity_data, provider,
+  last_sign_in_at, created_at, updated_at
+) VALUES
+  (
+    'admin@certusmentoria.pe',
+    '00000000-0000-0000-0000-000000000001',
+    '{"sub":"00000000-0000-0000-0000-000000000001","email":"admin@certusmentoria.pe","email_verified":true,"phone_verified":false}',
+    'email', NOW(), NOW(), NOW()
+  ),
+  (
+    'carlos.mendoza@certusmentoria.pe',
+    '00000000-0000-0000-0000-000000000002',
+    '{"sub":"00000000-0000-0000-0000-000000000002","email":"carlos.mendoza@certusmentoria.pe","email_verified":true,"phone_verified":false}',
+    'email', NOW(), NOW(), NOW()
+  ),
+  (
+    'ana.garcia@certusmentoria.pe',
+    '00000000-0000-0000-0000-000000000003',
+    '{"sub":"00000000-0000-0000-0000-000000000003","email":"ana.garcia@certusmentoria.pe","email_verified":true,"phone_verified":false}',
+    'email', NOW(), NOW(), NOW()
+  ),
+  (
+    'luis.torres@certusmentoria.pe',
+    '00000000-0000-0000-0000-000000000004',
+    '{"sub":"00000000-0000-0000-0000-000000000004","email":"luis.torres@certusmentoria.pe","email_verified":true,"phone_verified":false}',
+    'email', NOW(), NOW(), NOW()
+  ),
+  (
+    'sofia.ramirez@certusmentoria.pe',
+    '00000000-0000-0000-0000-000000000005',
+    '{"sub":"00000000-0000-0000-0000-000000000005","email":"sofia.ramirez@certusmentoria.pe","email_verified":true,"phone_verified":false}',
+    'email', NOW(), NOW(), NOW()
+  )
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
 -- 2. ACTUALIZAR PROFILES
 -- El trigger ya insertó los registros; aquí actualizamos rol y bio
 -- ============================================================

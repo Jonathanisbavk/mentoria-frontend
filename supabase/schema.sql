@@ -151,6 +151,7 @@ alter table public.feedback        enable row level security;
 
 -- Policies — se eliminan antes de recrear para evitar conflictos
 drop policy if exists "Profiles son visibles por todos"    on public.profiles;
+drop policy if exists "Usuarios crean su propio perfil"    on public.profiles;
 drop policy if exists "Usuarios editan su propio perfil"   on public.profiles;
 drop policy if exists "Mentor profiles visibles por todos" on public.mentor_profiles;
 drop policy if exists "Mentores crean su perfil"           on public.mentor_profiles;
@@ -165,6 +166,9 @@ drop policy if exists "Participantes dejan feedback en sesiones completadas" on 
 -- Profiles
 create policy "Profiles son visibles por todos"
   on public.profiles for select using (true);
+
+create policy "Usuarios crean su propio perfil"
+  on public.profiles for insert with check (auth.uid() = id);
 
 create policy "Usuarios editan su propio perfil"
   on public.profiles for update using (auth.uid() = id);

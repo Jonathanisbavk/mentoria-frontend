@@ -1,0 +1,45 @@
+# Enforce LF line endings in the repository for all text files.
+# This prevents CRLF issues when deploying to Linux (Vercel/Supabase).
+* text=auto eol=lf
+
+# Source code
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.js   text eol=lf
+*.jsx  text eol=lf
+*.mjs  text eol=lf
+*.cjs  text eol=lf
+
+# Styles & markup
+*.css  text eol=lf
+*.html text eol=lf
+
+# Config & data
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.toml text eol=lf
+*.env  text eol=lf
+*.md   text eol=lf
+*.mdx  text eol=lf
+
+# Database
+*.sql  text eol=lf
+
+# Shell scripts (must be LF or they break on Linux)
+*.sh   text eol=lf
+
+# Binary files — never convert
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.svg    binary
+*.webp   binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.eot    binary
+*.pdf    binary
+*.zip    binary
